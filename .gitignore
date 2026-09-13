@@ -1,0 +1,7 @@
+build/
+.cache/
+.xmake/
+
+*.p12
+
+compile_commands.json
