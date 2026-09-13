@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-package com.rplc.gles_template;
+package com.rplc.learn_gles;
 
 import org.libsdl.app.SDLActivity;
 

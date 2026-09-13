@@ -1,8 +1,7 @@
-# OpenGL ES x SDL3 Template
+# Learning OpenGL ES
 ## About
 
-A basic OpenGL ES and SDL3 template project in C++ to get
-started in graphics programming.
+Just logs of my OpenGL ES learning journey.
 
 ## Building
 ### Prerequisites

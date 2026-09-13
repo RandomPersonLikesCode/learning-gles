@@ -10,7 +10,7 @@ end
 
 local sdl_root = sdk .. "/lib/SDL3/" .. arch
 
-set_project("gles-template")
+set_project("learn-gles")
 set_version("1.0.0")
 
 add_rules("mode.debug", "mode.release")
