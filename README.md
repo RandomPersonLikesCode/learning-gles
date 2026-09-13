@@ -41,5 +41,3 @@ more information.
 This template is licensed under the MIT License, this project
 also uses some third party libraries, more information can
 be found inside `THIRD_PARTY_LICENSE`.
-
-App icon is licensed under CC0 1.0 Universal.
