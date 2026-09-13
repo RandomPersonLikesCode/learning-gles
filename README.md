@@ -38,6 +38,6 @@ more information.
 
 ## License
 
-This repo is licensed under the MIT License, this project
-also usessome third party libraries, more information can
+This repo is licensed under the MIT License, this repo
+also uses some third party libraries, more information can
 be found inside `THIRD_PARTY_LICENSE`.
