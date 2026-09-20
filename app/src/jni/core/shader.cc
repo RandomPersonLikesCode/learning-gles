@@ -25,10 +25,10 @@ void Core::Shader::create(const char *path, GLenum type) {
 
 void Core::Program::create(void) {
   Core::Shader vert = {};
-  vert.create("vertex.glsl", GL_VERTEX_SHADER);
+  vert.create("shaders/main.vert.glsl", GL_VERTEX_SHADER);
 
   Core::Shader frag = {};
-  frag.create("fragment.glsl", GL_FRAGMENT_SHADER);
+  frag.create("shaders/main.frag.glsl", GL_FRAGMENT_SHADER);
 
   this->id = glCreateProgram();
   glAttachShader(this->id, vert.id);
