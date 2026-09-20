@@ -49,7 +49,7 @@ bool Core::Display::create(void) {
   return true;
 }
 
-Core::Display::~Display(void) {
+void Core::Display::destroy(void) {
   SDL_GL_MakeCurrent(nullptr, nullptr);
 
   SDL_GL_DestroyContext(this->context);

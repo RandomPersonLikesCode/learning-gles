@@ -15,8 +15,9 @@ Just logs of my OpenGL ES learning journey.
 
 Precompiled dependencies:
 - SDL3 (v3.4.14)
+- GLM (v1.0.3)
 
-Make sure to have `.a` for the listed dependencies, for arm64-v8a
+Make sure to have `.a`/header only library for the listed dependencies, for arm64-v8a
 and armeabi-v7a architecture inside `$ANDROID_HOME/lib`. make
 sure to also put necessary headers inside `$ANDROID_HOME/include`.
 

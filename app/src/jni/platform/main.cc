@@ -67,5 +67,8 @@ int main(int argc, char **argv) {
 
   glDeleteBuffers(1, &vbo);
   glDeleteVertexArrays(1, &vao);
+
+  prog.destroy();
+  dp.destroy();
   return 0;
 }

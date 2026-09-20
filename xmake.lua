@@ -22,7 +22,7 @@ set_defaultarchs("arm64-v8a")
 set_defaultmode("debug")
 
 set_kind("shared")
-set_languages("cxx23")
+set_languages("cxx17")
 
 set_warnings("allextra", "pedantic")
 

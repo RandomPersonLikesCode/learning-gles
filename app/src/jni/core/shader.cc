@@ -42,12 +42,15 @@ void Core::Program::create(void) {
     char msg_buff[512] = "";
     glGetProgramInfoLog(this->id, sizeof(msg_buff), nullptr, msg_buff);
   }
+
+  frag.destroy();
+  vert.destroy();
 }
 
-Core::Shader::~Shader(void) {
+void Core::Shader::destroy(void) {
   glDeleteShader(this->id);
 }
 
-Core::Program::~Program(void) {
+void Core::Program::destroy(void) {
   glDeleteProgram(this->id);
 }

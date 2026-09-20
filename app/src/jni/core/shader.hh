@@ -9,13 +9,13 @@ namespace Core {
     GLuint id;
 
     void create(const char *path, GLenum type);
-    ~Shader(void);
+    void destroy(void);
   };
 
   struct Program {
     GLuint id;
 
     void create(void);
-    ~Program(void);
+    void destroy(void);
   };
 } // namespace Core

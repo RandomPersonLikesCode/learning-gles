@@ -21,6 +21,6 @@ namespace Core {
     } config;
 
     bool create(void);
-    ~Display(void);
+    void destroy(void);
   };
 } // namespace Core
