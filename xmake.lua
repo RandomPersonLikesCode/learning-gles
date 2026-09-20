@@ -28,7 +28,10 @@ set_warnings("allextra", "pedantic")
 
 add_cxxflags({
   "-fno-rtti",
-  "-fno-exceptions"
+  "-fno-exceptions",
+  "-fvisibility=hidden",
+  "-fvisibility-inlines-hidden"
+
 })
 add_shflags({
   "-Wl,--as-needed",
