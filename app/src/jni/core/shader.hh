@@ -15,6 +15,13 @@ namespace Core {
   struct Program {
     GLuint id;
 
+    struct {
+      GLint tex;
+      GLint model;
+      GLint view;
+      GLint proj;
+    } uniforms;
+
     void create(void);
     void destroy(void);
   };

@@ -43,6 +43,11 @@ void Core::Program::create(void) {
     glGetProgramInfoLog(this->id, sizeof(msg_buff), nullptr, msg_buff);
   }
 
+  this->uniforms.tex   = glGetUniformLocation(this->id, "tex");
+  this->uniforms.model = glGetUniformLocation(this->id, "model");
+  this->uniforms.view  = glGetUniformLocation(this->id, "view");
+  this->uniforms.proj  = glGetUniformLocation(this->id, "proj");
+
   frag.destroy();
   vert.destroy();
 }

@@ -2,6 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
+#include "../core/camera.hh"
 #include "../core/display.hh"
 #include "../core/shader.hh"
 #include "../core/shapes.hh"
@@ -11,14 +12,11 @@
 #include <GLES3/gl32.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_float4x4.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/vector_float3.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/trigonometric.hpp>
 
 int main(int argc, char **argv) {
+  stbi_set_flip_vertically_on_load(true);
+
   Core::Display dp = {};
   dp.config.title  = "GLES Template";
   dp.config.width  = 800;
@@ -33,38 +31,20 @@ int main(int argc, char **argv) {
 
   glEnable(GL_DEPTH_TEST);
 
+  Core::Camera cam = {};
+  cam.create(dp.config.aspect_ratio);
+
   Core::Program prog = {};
   prog.create();
 
   Core::Cube cube = {};
   cube.create();
 
-  stbi_set_flip_vertically_on_load(true);
-
   Core::Texture metal = {};
   metal.create("textures/metal.png");
 
-  GLint tex   = glGetUniformLocation(prog.id, "tex");
-  GLint model = glGetUniformLocation(prog.id, "model");
-  GLint view  = glGetUniformLocation(prog.id, "view");
-  GLint proj  = glGetUniformLocation(prog.id, "proj");
-
-  glm::vec3 cam_pos   = glm::vec3(0.0f, 0.0f, 5.0f);
-  glm::vec3 cam_front = glm::vec3(0.0f, 0.0f, -1.0f);
-
-  glm::mat4 model_mat(1.0f);
-  glm::mat4 view_mat = glm::lookAt(cam_pos, cam_pos + cam_front,
-                                   glm::vec3(0.0f, 1.0f, 0.0f));
-  glm::mat4 proj_mat = glm::perspective(
-      glm::radians(45.0f), dp.config.aspect_ratio, 0.1f, 100.0f);
-
-  bool  is_running = true;
-  float deg        = 0.0f;
-
-  bool move_f = false;
-  bool move_b = false;
-
-  Uint64 last = SDL_GetTicksNS();
+  Uint64 last       = SDL_GetTicksNS();
+  bool   is_running = true;
   while (is_running) {
     SDL_Event events = {};
 
@@ -80,17 +60,17 @@ int main(int argc, char **argv) {
           }
 
           if (events.tfinger.y < 0.75f) {
-            move_f = true;
+            cam.is_move_fwd = true;
           }
 
           if (events.tfinger.y > 0.75f) {
-            move_b = true;
+            cam.is_move_bwd = true;
           }
 
           break;
         case SDL_EVENT_FINGER_UP:
-          move_f = false;
-          move_b = false;
+          cam.is_move_fwd = false;
+          cam.is_move_bwd = false;
       }
     }
 
@@ -100,32 +80,30 @@ int main(int argc, char **argv) {
 
     last = current;
 
-    deg += 100.0f * dt;
     float cam_speed = 2.5f * dt;
 
-    model_mat = glm::rotate(glm::mat4(1.0f), glm::radians(deg),
-                            glm::vec3(1.0f, 1.0f, 0.0f));
-
-    if (move_f) {
-      cam_pos += cam_speed * cam_front;
+    if (cam.is_move_fwd) {
+      cam.position += cam_speed * cam.front;
     }
 
-    if (move_b) {
-      cam_pos -= cam_speed * cam_front;
+    if (cam.is_move_bwd) {
+      cam.position -= cam_speed * cam.front;
     }
 
-    view_mat = glm::lookAt(cam_pos, cam_pos + cam_front,
-                           glm::vec3(0.0f, 1.0f, 0.0f));
+    cam.update();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(prog.id);
     glBindVertexArray(cube.vao);
 
-    glUniform1i(tex, 0);
-    glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(model_mat));
-    glUniformMatrix4fv(view, 1, GL_FALSE, glm::value_ptr(view_mat));
-    glUniformMatrix4fv(proj, 1, GL_FALSE, glm::value_ptr(proj_mat));
+    glUniform1i(prog.uniforms.tex, 0);
+    glUniformMatrix4fv(prog.uniforms.model, 1, GL_FALSE,
+                       glm::value_ptr(cam.model));
+    glUniformMatrix4fv(prog.uniforms.view, 1, GL_FALSE,
+                       glm::value_ptr(cam.view));
+    glUniformMatrix4fv(prog.uniforms.proj, 1, GL_FALSE,
+                       glm::value_ptr(cam.proj));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, metal.id);
