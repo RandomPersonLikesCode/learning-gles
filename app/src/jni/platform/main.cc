@@ -61,6 +61,9 @@ int main(int argc, char **argv) {
   bool  is_running = true;
   float deg        = 0.0f;
 
+  bool move_f = false;
+  bool move_b = false;
+
   Uint64 last = SDL_GetTicksNS();
   while (is_running) {
     SDL_Event events = {};
@@ -71,6 +74,23 @@ int main(int argc, char **argv) {
           is_running = false;
 
           break;
+        case SDL_EVENT_FINGER_DOWN:
+          if (!(events.tfinger.x < 0.5f && events.tfinger.y > 0.5f)) {
+            break;
+          }
+
+          if (events.tfinger.y < 0.75f) {
+            move_f = true;
+          }
+
+          if (events.tfinger.y > 0.75f) {
+            move_b = true;
+          }
+
+          break;
+        case SDL_EVENT_FINGER_UP:
+          move_f = false;
+          move_b = false;
       }
     }
 
@@ -81,9 +101,21 @@ int main(int argc, char **argv) {
     last = current;
 
     deg += 100.0f * dt;
+    float cam_speed = 2.5f * dt;
 
     model_mat = glm::rotate(glm::mat4(1.0f), glm::radians(deg),
                             glm::vec3(1.0f, 1.0f, 0.0f));
+
+    if (move_f) {
+      cam_pos += cam_speed * cam_front;
+    }
+
+    if (move_b) {
+      cam_pos -= cam_speed * cam_front;
+    }
+
+    view_mat = glm::lookAt(cam_pos, cam_pos + cam_front,
+                           glm::vec3(0.0f, 1.0f, 0.0f));
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
