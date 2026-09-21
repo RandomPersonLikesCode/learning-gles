@@ -80,15 +80,7 @@ int main(int argc, char **argv) {
 
     last = current;
 
-    float cam_speed = 2.5f * dt;
-
-    if (cam.is_move_fwd) {
-      cam.position += cam_speed * cam.front;
-    }
-
-    if (cam.is_move_bwd) {
-      cam.position -= cam_speed * cam.front;
-    }
+    cam.speed = 2.5f * dt;
 
     cam.update();
 
