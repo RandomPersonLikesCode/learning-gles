@@ -18,10 +18,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 
-GLfloat verts[] = {
-  0.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
-};
-
 int main(int argc, char **argv) {
   Core::Display dp = {};
   dp.config.title  = "GLES Template";
