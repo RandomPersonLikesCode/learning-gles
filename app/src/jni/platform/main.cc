@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+#define STBI_ONLY_PNG
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "../core/camera.hh"
@@ -12,7 +13,12 @@
 #include <GLES3/gl32.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <cmath>
+#include <glm/common.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/trigonometric.hpp>
 
 int main(int argc, char **argv) {
   stbi_set_flip_vertically_on_load(true);
@@ -46,41 +52,83 @@ int main(int argc, char **argv) {
   Uint64 last       = SDL_GetTicksNS();
   bool   is_running = true;
   while (is_running) {
-    SDL_Event events = {};
-
-    while (SDL_PollEvent(&events)) {
-      switch (events.type) {
-        case SDL_EVENT_QUIT:
-          is_running = false;
-
-          break;
-        case SDL_EVENT_FINGER_DOWN:
-          if (!(events.tfinger.x < 0.5f && events.tfinger.y > 0.5f)) {
-            break;
-          }
-
-          if (events.tfinger.y < 0.75f) {
-            cam.is_move_fwd = true;
-          }
-
-          if (events.tfinger.y > 0.75f) {
-            cam.is_move_bwd = true;
-          }
-
-          break;
-        case SDL_EVENT_FINGER_UP:
-          cam.is_move_fwd = false;
-          cam.is_move_bwd = false;
-      }
-    }
-
     Uint64 current = SDL_GetTicksNS();
 
     double dt = static_cast<double>((current - last)) / SDL_NS_PER_SECOND;
 
     last = current;
 
-    cam.speed = 2.5f * dt;
+    SDL_Event events = {};
+    while (SDL_PollEvent(&events)) {
+      switch (events.type) {
+        case SDL_EVENT_QUIT:
+          is_running = false;
+
+          break;
+        case SDL_EVENT_FINGER_UP:
+          cam.is_first_touch = true;
+
+          break;
+        case SDL_EVENT_FINGER_MOTION:
+          cam.finger.pos_x = events.tfinger.x * dp.config.width_px;
+          cam.finger.pos_y = events.tfinger.y * dp.config.height_px;
+
+          if (cam.is_first_touch) {
+            cam.finger.last_pos_x = cam.finger.pos_x;
+            cam.finger.last_pos_y = cam.finger.pos_y;
+
+            cam.is_first_touch = false;
+          }
+
+          // TODO: Make the finger doesn't interfere with
+          // each other
+
+          if (events.tfinger.x > 0.5f) {
+            cam.finger.offset_x = cam.finger.pos_x - cam.finger.last_pos_x;
+            cam.finger.offset_y = cam.finger.last_pos_y - cam.finger.pos_y;
+            cam.finger.last_pos_x = cam.finger.pos_x;
+            cam.finger.last_pos_y = cam.finger.pos_y;
+
+            cam.finger.offset_x *= cam.sensitivity;
+            cam.finger.offset_y *= cam.sensitivity;
+
+            cam.yaw += cam.finger.offset_x;
+            cam.pitch += cam.finger.offset_y;
+
+            cam.pitch = glm::clamp(cam.pitch, -89.0f, 89.0f);
+
+            glm::vec3 dir;
+
+            dir.x = std::cos(glm::radians(cam.yaw))
+                  * std::cos(glm::radians(cam.pitch));
+            dir.y = std::sin(glm::radians(cam.pitch));
+            dir.z = std::sin(glm::radians(cam.yaw))
+                  * std::cos(glm::radians(cam.pitch));
+
+            cam.front = glm::normalize(dir);
+          }
+
+          if (events.tfinger.x < 0.5f) {
+            cam.finger.offset_y = cam.finger.last_pos_y - cam.finger.pos_y;
+            cam.finger.last_pos_y = cam.finger.pos_y;
+
+            // TODO: Make the camera movement based on the
+            // finger's offset instead of fixed speed
+
+            if (cam.finger.offset_y > 0) {
+              cam.position -= cam.speed * cam.front;
+            }
+
+            if (cam.finger.offset_y < 0) {
+              cam.position += cam.speed * cam.front;
+            }
+          }
+
+          break;
+      }
+    }
+
+    cam.speed = 5.0f * dt;
 
     cam.update();
 

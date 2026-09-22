@@ -15,9 +15,20 @@ namespace Core {
     glm::vec3 front;
 
     float speed;
+    float sensitivity = 0.2f;
+    float yaw         = -90.0f;
+    float pitch;
 
-    bool is_move_fwd;
-    bool is_move_bwd;
+    struct {
+      float pos_x;
+      float pos_y;
+      float last_pos_x;
+      float last_pos_y;
+      float offset_x;
+      float offset_y;
+    } finger;
+
+    bool is_first_touch = true;
 
     void create(float aspect_ratio);
     void update(void);

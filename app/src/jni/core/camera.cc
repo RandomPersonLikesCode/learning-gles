@@ -20,14 +20,6 @@ void Core::Camera::create(float aspect_ratio) {
 }
 
 void Core::Camera::update(void) {
-  if (this->is_move_fwd) {
-    this->position += this->speed * this->front;
-  }
-
-  if (this->is_move_bwd) {
-    this->position -= this->speed * this->front;
-  }
-
   this->view = glm::lookAt(this->position, this->position + this->front,
                            glm::vec3(0.0f, 1.0f, 0.0f));
 }
