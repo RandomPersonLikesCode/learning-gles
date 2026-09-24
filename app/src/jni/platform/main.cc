@@ -8,6 +8,9 @@
 #include "../core/shader.hh"
 #include "../core/shapes.hh"
 #include "../core/texture.hh"
+#include "imgui.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl3.h"
 #include "stb_image.h"
 
 #include <GLES3/gl32.h>
@@ -37,6 +40,19 @@ int main(int argc, char **argv) {
 
   glEnable(GL_DEPTH_TEST);
 
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+
+  ImGui::StyleColorsDark();
+
+  ImGuiStyle &style   = ImGui::GetStyle();
+  float       scaling = dp.config.scaling - 0.5f;
+  style.ScaleAllSizes(scaling);
+  style.FontScaleDpi = scaling;
+
+  ImGui_ImplSDL3_InitForOpenGL(dp.window, dp.context);
+  ImGui_ImplOpenGL3_Init("#version 300 es");
+
   Core::Camera cam = {};
   cam.create(dp.config.aspect_ratio);
 
@@ -60,6 +76,13 @@ int main(int argc, char **argv) {
 
     SDL_Event events = {};
     while (SDL_PollEvent(&events)) {
+      ImGui_ImplSDL3_ProcessEvent(&events);
+      ImGuiIO &io = ImGui::GetIO();
+
+      if (io.WantCaptureMouse | io.WantTextInput) {
+        continue;
+      }
+
       switch (events.type) {
         case SDL_EVENT_QUIT:
           is_running = false;
@@ -132,6 +155,18 @@ int main(int argc, char **argv) {
 
     cam.update();
 
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Test window");
+
+    ImGui::Text("Lorem ipsum");
+
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(prog.id);
@@ -150,12 +185,20 @@ int main(int argc, char **argv) {
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     SDL_GL_SwapWindow(dp.window);
   }
 
   metal.destroy();
   cube.destroy();
   prog.destroy();
+
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplSDL3_Shutdown();
+  ImGui::DestroyContext();
+
   dp.destroy();
   return 0;
 }
