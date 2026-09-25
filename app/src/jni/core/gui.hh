@@ -7,11 +7,11 @@
 #include <SDL3/SDL.h>
 
 namespace Core {
-  namespace ImGui {
+  namespace Gui {
     void create(SDL_Window *window, SDL_GLContext context, float scaling);
     void destroy(void);
 
     void update(void);
     void render(void);
-  } // namespace ImGui
+  } // namespace Gui
 } // namespace Core
