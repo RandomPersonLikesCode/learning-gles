@@ -5,6 +5,7 @@
 
 #include "../core/camera.hh"
 #include "../core/display.hh"
+#include "../core/imgui.hh"
 #include "../core/shader.hh"
 #include "../core/shapes.hh"
 #include "../core/texture.hh"
@@ -40,18 +41,7 @@ int main(int argc, char **argv) {
 
   glEnable(GL_DEPTH_TEST);
 
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-
-  ImGui::StyleColorsDark();
-
-  ImGuiStyle &style   = ImGui::GetStyle();
-  float       scaling = dp.config.scaling - 0.5f;
-  style.ScaleAllSizes(scaling);
-  style.FontScaleDpi = scaling;
-
-  ImGui_ImplSDL3_InitForOpenGL(dp.window, dp.context);
-  ImGui_ImplOpenGL3_Init("#version 300 es");
+  Core::ImGui::create(dp.window, dp.context, dp.config.scaling - 0.5f);
 
   Core::Camera cam = {};
   cam.create(dp.config.aspect_ratio);
@@ -155,17 +145,7 @@ int main(int argc, char **argv) {
 
     cam.update();
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    ImGui::Begin("Test window");
-
-    ImGui::Text("Lorem ipsum");
-
-    ImGui::End();
-
-    ImGui::ShowDemoWindow();
+    Core::ImGui::update();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -185,8 +165,7 @@ int main(int argc, char **argv) {
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    Core::ImGui::render();
 
     SDL_GL_SwapWindow(dp.window);
   }
@@ -194,11 +173,7 @@ int main(int argc, char **argv) {
   metal.destroy();
   cube.destroy();
   prog.destroy();
-
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplSDL3_Shutdown();
-  ImGui::DestroyContext();
-
+  Core::ImGui::destroy();
   dp.destroy();
   return 0;
 }
